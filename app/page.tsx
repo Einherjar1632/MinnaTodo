@@ -10,32 +10,26 @@ export default function Home() {
         <form className="space-y-4 max-w-md w-full mx-auto">
           <div>
             <label htmlFor="groupName" className="block text-sm font-medium text-gray-700 mb-1">
-              グループ名
+              Todoのグループ名
             </label>
             <input
               type="text"
               id="groupName"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm"
-              placeholder="北海道旅行"
+              placeholder="BBQの買い物リスト、家族旅行の準備リスト 等"
             />
           </div>
           <div>
             <label htmlFor="memberName" className="block text-sm font-medium text-gray-700 mb-1">
-              メンバー名
+              あなたの名前
             </label>
             <div className="flex">
               <input
                 type="text"
                 id="memberName"
                 className="flex-grow px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm"
-                placeholder="あおい"
+                placeholder="ニックネームやお名前を入力してください"
               />
-              <button
-                type="button"
-                className="bg-teal-500 text-white px-3 py-2 rounded-r-md hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 text-sm"
-              >
-                追加
-              </button>
             </div>
           </div>
           <button
