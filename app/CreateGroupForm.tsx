@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 // モックのグループ作成関数
@@ -17,10 +17,21 @@ export default function CreateGroupForm() {
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
 
+    useEffect(() => {
+        // コンポーネントマウント時にローカルストレージからニックネームを取得
+        const storedNickname = localStorage.getItem('userNickname');
+        if (storedNickname) {
+            setMemberName(storedNickname);
+        }
+    }, []);
+
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsLoading(true);
         try {
+            // ニックネームをローカルストレージに保存
+            localStorage.setItem('userNickname', memberName);
+
             const groupId = await mockCreateGroup(groupName, memberName);
             router.push(`/group-confirmation/${groupId}`);
         } catch (error) {
