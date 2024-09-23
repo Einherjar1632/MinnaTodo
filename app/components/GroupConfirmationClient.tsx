@@ -2,6 +2,7 @@
 
 import { CheckIcon } from 'lucide-react';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation'; // 修正
 
 interface GroupConfirmationClientProps {
     groupUrl: string;
@@ -9,11 +10,16 @@ interface GroupConfirmationClientProps {
 
 export default function GroupConfirmationClient({ groupUrl }: GroupConfirmationClientProps) {
     const [copied, setCopied] = useState(false);
+    const router = useRouter(); // 修正
 
     const handleCopy = () => {
         navigator.clipboard.writeText(groupUrl);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
+    };
+
+    const handleNavigate = () => {
+        router.push('/todo-list'); // 追加
     };
 
     return (
@@ -45,8 +51,8 @@ export default function GroupConfirmationClient({ groupUrl }: GroupConfirmationC
                 </button>
             </div>
             <a
-                href={groupUrl}
-                className="block w-full text-center border border-teal-500 text-teal-500 py-3 rounded-md hover:bg-teal-50 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
+                onClick={handleNavigate} // 変更
+                className="block w-full text-center border border-teal-500 text-teal-500 py-3 rounded-md hover:bg-teal-50 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 cursor-pointer" // 変更
             >
                 グループページへ進む
             </a>
