@@ -6,7 +6,7 @@ export default function TodoListPage() {
         <div className="min-h-screen bg-white flex flex-col">
             <Header />
             {/* ナビゲーションバー */}
-            <div className="bg-teal-500 text-white px-4 py-2 flex justify-between items-center">
+            <div className="bg-gray-100 text-black px-4 py-2 flex justify-between items-center">
                 <Home className="w-6 h-6" />
                 <div className="flex space-x-4">
                     <User className="w-6 h-6" />
