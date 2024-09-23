@@ -2,19 +2,10 @@ import { Home, User, Menu, Trash2, MoreVertical, Plus } from 'lucide-react';
 
 export default function TodoList() {
     return (
-        <div className="min-h-screen bg-gray-100 flex flex-col">
-            {/* ステータスバー */}
-            <div className="bg-orange-500 text-white px-4 py-2 flex justify-between items-center">
-                <span className="text-lg font-semibold">11:54</span>
-                <div className="flex items-center space-x-2">
-                    <span>●●●●</span>
-                    <span>📶</span>
-                    <span>82%</span>
-                </div>
-            </div>
+        <div className="min-h-screen bg-white flex flex-col">
 
             {/* ナビゲーションバー */}
-            <div className="bg-orange-500 text-white px-4 py-2 flex justify-between items-center">
+            <div className="bg-teal-500 text-white px-4 py-2 flex justify-between items-center">
                 <Home className="w-6 h-6" />
                 <div className="flex space-x-4">
                     <User className="w-6 h-6" />
@@ -23,8 +14,8 @@ export default function TodoList() {
             </div>
 
             {/* セグメントコントロール */}
-            <div className="flex bg-white rounded-full m-4 p-1">
-                <button className="flex-1 bg-orange-500 text-white rounded-full py-2 px-4">
+            <div className="flex bg-gray-100 rounded-full m-4 p-1">
+                <button className="flex-1 bg-teal-500 text-white rounded-full py-2 px-4">
                     やることリスト
                 </button>
                 <button className="flex-1 text-gray-600 rounded-full py-2 px-4">
@@ -33,7 +24,7 @@ export default function TodoList() {
             </div>
 
             {/* TODOリスト */}
-            <div className="flex-1 bg-white mx-4 rounded-lg overflow-hidden">
+            <div className="flex-1 bg-gray-100 mx-4 rounded-lg overflow-hidden">
                 <div className="p-4 space-y-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
@@ -60,7 +51,7 @@ export default function TodoList() {
                     </div>
                     <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
-                            <div className="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center">
+                            <div className="w-6 h-6 bg-teal-500 rounded-full flex items-center justify-center">
                                 <span className="text-white">✓</span>
                             </div>
                             <div>
@@ -75,7 +66,7 @@ export default function TodoList() {
 
             {/* フローティングアクションボタン */}
             <div className="fixed bottom-20 right-4">
-                <button className="bg-orange-500 text-white rounded-full p-4 shadow-lg">
+                <button className="bg-teal-500 text-white rounded-full p-4 shadow-lg">
                     <Plus className="w-6 h-6" />
                 </button>
             </div>
@@ -84,8 +75,8 @@ export default function TodoList() {
             <div className="bg-white p-4 border-t">
                 <div className="flex justify-between items-center">
                     <div>
-                        <p className="text-xs text-gray-500">東急Livable株式會社</p>
-                        <p className="font-semibold">厳選東京都心豪宅</p>
+                        <p className="text-xs text-gray-500">ここに広告を表示する予定</p>
+                        <p className="font-semibold">ここに広告を表示する予定</p>
                     </div>
                     <button className="bg-blue-500 text-white px-4 py-2 rounded-full text-sm">
                         詳細 ＞
