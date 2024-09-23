@@ -1,9 +1,10 @@
+import Header from '../components/Header';
 import { Home, User, Menu, Trash2, MoreVertical, Plus } from 'lucide-react';
 
-export default function TodoList() {
+export default function TodoListPage() {
     return (
         <div className="min-h-screen bg-white flex flex-col">
-
+            <Header />
             {/* ナビゲーションバー */}
             <div className="bg-teal-500 text-white px-4 py-2 flex justify-between items-center">
                 <Home className="w-6 h-6" />

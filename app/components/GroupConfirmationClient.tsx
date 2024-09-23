@@ -3,6 +3,7 @@
 import { CheckIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation'; // 修正
+import Header from './Header';
 
 interface GroupConfirmationClientProps {
     groupUrl: string;
@@ -24,6 +25,7 @@ export default function GroupConfirmationClient({ groupUrl }: GroupConfirmationC
 
     return (
         <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+            <Header />
             <div className="flex justify-center">
                 <div className="bg-teal-500 rounded-full p-3">
                     <CheckIcon className="w-12 h-12 text-white" />
