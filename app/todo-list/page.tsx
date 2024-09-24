@@ -1,5 +1,5 @@
 import Header from '../components/Header';
-import { Home, User, Menu, Trash2, MoreVertical, Plus } from 'lucide-react';
+import { Home, User, Menu, MoreVertical, Plus } from 'lucide-react';
 
 export default function TodoListPage() {
     return (
