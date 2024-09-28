@@ -2,6 +2,20 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
+import { v4 as uuidv4 } from 'uuid';
+
+// DynamoDBクライアントの設定
+const client = new DynamoDBClient({
+    region: process.env.NEXT_PUBLIC_AWS_REGION,
+    credentials: {
+        accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID!,
+        secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY!,
+    },
+});
+
+const docClient = DynamoDBDocumentClient.from(client);
 
 // モックのグループ作成関数
 const mockCreateGroup = async (groupName: string, memberName: string): Promise<string> => {
@@ -32,7 +46,23 @@ export default function CreateGroupForm() {
             // ニックネームをローカルストレージに保存
             localStorage.setItem('userNickname', memberName);
 
-            const groupId = await mockCreateGroup(groupName, memberName);
+            // グループIDの生成（UUID）
+            const groupId = uuidv4();
+
+            // DynamoDBにグループを登録
+            const currentTime = new Date().toISOString();
+            await docClient.send(
+                new PutCommand({
+                    TableName: "MinnaTodoGroups",
+                    Item: {
+                        GroupId: groupId,
+                        GroupName: groupName,
+                        CreatedAt: currentTime,
+                        LastUsedAt: currentTime,
+                    },
+                })
+            );
+
             router.push(`/group-confirmation/${groupId}`);
         } catch (error) {
             console.error("グループの作成に失敗しました", error);
