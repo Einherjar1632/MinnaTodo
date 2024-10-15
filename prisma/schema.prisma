@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+model Group {
+  id          Int        @id @default(autoincrement())
+  groupName   String     @map("group_name") @db.VarChar(100)
+  hashValue   String     @unique @map("hash_value") @db.VarChar(64)
+  createdAt   DateTime   @default(now()) @map("created_at")
+  lastUsedAt  DateTime   @default(now()) @map("last_used_at")
+  users       User[]
+  todoLists   TodoList[]
+
+  @@map("groups")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  groupId   Int      @map("group_id")
+  nickname  String   @db.VarChar(50)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  todos     Todo[]
+
+  @@map("users")
+}
+
+model TodoList {
+  id        Int      @id @default(autoincrement())
+  groupId   Int      @map("group_id")
+  listName  String   @map("list_name") @db.VarChar(100)
+  sortOrder Int      @default(0) @map("sort_order")
+  isDeleted Boolean  @default(false) @map("is_deleted")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  todos     Todo[]
+
+  @@map("todo_lists")
+}
+
+model Todo {
+  id        Int       @id @default(autoincrement())
+  listId    Int       @map("list_id")
+  title     String    @db.VarChar(200)
+  dueDate   DateTime? @map("due_date") @db.Date
+  assigneeId Int?     @map("assignee")
+  memo      String?
+  sortOrder Int       @default(0) @map("sort_order")
+  isDeleted Boolean   @default(false) @map("is_deleted")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at")
+  todoList  TodoList  @relation(fields: [listId], references: [id], onDelete: Cascade)
+  assignee  User?     @relation(fields: [assigneeId], references: [id])
+  subtodos  Subtodo[]
+
+  @@map("todos")
+}
+
+model Subtodo {
+  id        Int      @id @default(autoincrement())
+  todoId    Int      @map("todo_id")
+  title     String   @db.VarChar(200)
+  sortOrder Int      @default(0) @map("sort_order")
+  isDeleted Boolean  @default(false) @map("is_deleted")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  todo      Todo     @relation(fields: [todoId], references: [id], onDelete: Cascade)
+
+  @@map("subtodos")
+}
+
