@@ -8,6 +8,7 @@ interface CreateGroupRequest {
 }
 
 interface CreateGroupResponse {
+    id: number;
     uuid: string;
 }
 
@@ -40,6 +41,20 @@ export default function CreateGroupForm() {
 
             if (response.ok) {
                 const data: CreateGroupResponse = await response.json();
+
+                // グループ作成後にユーザーを作成
+                const userResponse = await fetch('/api/users', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ nickname: memberName, groupId: data.id }),
+                });
+
+                if (!userResponse.ok) {
+                    console.error('ユーザーの作成に失敗しました');
+                }
+
                 router.push(`/group-confirmation/${data.uuid}`);
             } else {
                 console.error('グループの作成に失敗しました');
