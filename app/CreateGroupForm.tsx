@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { v4 as uuidv4 } from 'uuid';
 
 export default function CreateGroupForm() {
     const [groupName, setGroupName] = useState("");
@@ -20,35 +19,23 @@ export default function CreateGroupForm() {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setIsLoading(true);
         try {
-            // ニックネームをローカルストレージに保存
-            localStorage.setItem('userNickname', memberName);
-
-            // グループIDの生成（UUID）
-            const groupId = uuidv4();
-
-            // Prismaを使用してグループを登録
             const response = await fetch('/api/groups', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    groupName: groupName
-                }),
+                body: JSON.stringify({ groupName: groupName }),
             });
 
-            if (!response.ok) {
-                throw new Error('グループの作成に失敗しました');
+            if (response.ok) {
+                const data = await response.json();
+                router.push(`/group-confirmation/${data.uuid}`);
+            } else {
+                console.error('グループの作成に失敗しました');
             }
-
-            router.push(`/group-confirmation/${groupId}`);
         } catch (error) {
-            console.error("グループの作成に失敗しました", error);
-            alert("グループの作成に失敗しました。もう一度お試しください。");
-        } finally {
-            setIsLoading(false);
+            console.error('エラーが発生しました:', error);
         }
     };
 
