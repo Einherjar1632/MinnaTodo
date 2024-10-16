@@ -3,6 +3,14 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
+interface CreateGroupRequest {
+    groupName: string;
+}
+
+interface CreateGroupResponse {
+    uuid: string;
+}
+
 export default function CreateGroupForm() {
     const [groupName, setGroupName] = useState("");
     const [memberName, setMemberName] = useState("");
@@ -19,23 +27,27 @@ export default function CreateGroupForm() {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setIsLoading(true);
         try {
+            const requestData: CreateGroupRequest = { groupName: groupName };
             const response = await fetch('/api/groups', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ groupName: groupName }),
+                body: JSON.stringify(requestData),
             });
 
             if (response.ok) {
-                const data = await response.json();
+                const data: CreateGroupResponse = await response.json();
                 router.push(`/group-confirmation/${data.uuid}`);
             } else {
                 console.error('グループの作成に失敗しました');
             }
         } catch (error) {
             console.error('エラーが発生しました:', error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
