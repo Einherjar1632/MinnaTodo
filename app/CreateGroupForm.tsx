@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { CreateGroupRequest, CreateGroupResponse } from "@/app/api/groups/route";
+import { CreateUserRequest, CreateUserResponse } from "@/app/api/users/route";
 
 export default function CreateGroupForm() {
     const [groupName, setGroupName] = useState("");
@@ -22,32 +23,36 @@ export default function CreateGroupForm() {
         e.preventDefault();
         setIsLoading(true);
         try {
-            const requestData: CreateGroupRequest = { groupName: groupName };
-            const response = await fetch('/api/groups', {
+            const groupRequestData: CreateGroupRequest = { groupName: groupName };
+            const groupResponse = await fetch('/api/groups', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(requestData),
+                body: JSON.stringify(groupRequestData),
             });
 
-            if (response.ok) {
-                const data: CreateGroupResponse = await response.json();
+            if (groupResponse.ok) {
+                const groupData: CreateGroupResponse = await groupResponse.json();
 
-                // グループ作成後にユーザーを作成
+                const userRequestData: CreateUserRequest = {
+                    nickname: memberName,
+                    groupId: groupData.id
+                };
                 const userResponse = await fetch('/api/users', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ nickname: memberName, groupId: data.id }),
+                    body: JSON.stringify(userRequestData),
                 });
 
-                if (!userResponse.ok) {
+                if (userResponse.ok) {
+                    const userData: CreateUserResponse = await userResponse.json();
+                    router.push(`/group-confirmation/${groupData.uuid}`);
+                } else {
                     console.error('ユーザーの作成に失敗しました');
                 }
-
-                router.push(`/group-confirmation/${data.uuid}`);
             } else {
                 console.error('グループの作成に失敗しました');
             }
