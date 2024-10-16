@@ -7,10 +7,11 @@ datasource db {
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
+
 model Group {
   id          Int        @id @default(autoincrement())
   groupName   String     @map("group_name") @db.VarChar(100)
-  hashValue   String     @unique @map("hash_value") @db.VarChar(64)
+  uuid        String     @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   createdAt   DateTime   @default(now()) @map("created_at")
   lastUsedAt  DateTime   @default(now()) @map("last_used_at")
   users       User[]
@@ -75,4 +76,3 @@ model Subtodo {
 
   @@map("subtodos")
 }
-
