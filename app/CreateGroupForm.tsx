@@ -2,15 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-
-interface CreateGroupRequest {
-    groupName: string;
-}
-
-interface CreateGroupResponse {
-    id: number;
-    uuid: string;
-}
+import { CreateGroupRequest, CreateGroupResponse } from "@/app/api/groups/route";
 
 export default function CreateGroupForm() {
     const [groupName, setGroupName] = useState("");

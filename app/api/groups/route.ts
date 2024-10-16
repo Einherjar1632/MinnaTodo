@@ -4,10 +4,18 @@ import { v7 as uuidv7 } from 'uuid';
 
 const prisma = new PrismaClient();
 
+export interface CreateGroupRequest {
+    groupName: string;
+}
+
+export interface CreateGroupResponse {
+    id: number;
+    uuid: string;
+}
+
 export async function POST(request: Request) {
     try {
-
-        const { groupName } = await request.json();
+        const { groupName }: CreateGroupRequest = await request.json();
         const uuid = uuidv7();
 
         const newGroup = await prisma.group.create({
@@ -17,7 +25,12 @@ export async function POST(request: Request) {
             },
         });
 
-        return NextResponse.json(newGroup, { status: 201 });
+        const response: CreateGroupResponse = {
+            id: newGroup.id,
+            uuid: newGroup.uuid,
+        };
+
+        return NextResponse.json(response, { status: 201 });
         
     } catch (error) {
         console.error('グループの作成中にエラーが発生しました:', error);
