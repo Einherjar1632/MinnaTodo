@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { NextRequest } from 'next/server';
 
 const prisma = new PrismaClient();
 
@@ -21,7 +22,7 @@ export interface CreateUserResponse {
     };
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
     try {
         const { groupId, nickname }: CreateUserRequest = await request.json();
 

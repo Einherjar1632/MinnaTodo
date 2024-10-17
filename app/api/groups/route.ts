@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { v7 as uuidv7 } from 'uuid';
 
@@ -13,7 +13,7 @@ export interface CreateGroupResponse {
     uuid: string;
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
     try {
         const { groupName }: CreateGroupRequest = await request.json();
         const uuid = uuidv7();
