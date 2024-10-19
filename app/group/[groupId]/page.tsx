@@ -8,11 +8,12 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
             <Header />
 
             {/* Navigation */}
-            <div className="flex justify-between items-center px-4 py-2">
-                <Home className="w-8 h-8" />
+            <div className="flex items-center px-4 py-2">
+                <Home className="w-8 h-8 mr-4" />
                 <div className="bg-white text-teal-500 px-6 py-2 rounded-full font-bold">
                     やることリスト
                 </div>
+                <div className="flex-grow"></div>
                 <div className="flex space-x-4">
                     <SmilePlus className="w-8 h-8" />
                     <AlignJustify className="w-8 h-8" />
