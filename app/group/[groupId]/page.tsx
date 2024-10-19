@@ -17,7 +17,7 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
         { name: "子供1", color: "bg-green-500" },
         { name: "子供2", color: "bg-purple-500" }
     ]);
-    const [todoLists, setTodoLists] = useState([]);
+    const [todoLists, setTodoLists] = useState<{ id: string; listName: string }[]>([]);
 
     const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
     const [isNewCategoryModalOpen, setIsNewCategoryModalOpen] = useState(false);
@@ -51,12 +51,19 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
             }
             const data = await response.json();
 
-            if (Array.isArray(data) && data.length > 0) {
-                // 最初のTodoList名を設定する（または必要に応じて処理を変更）
-                setTodoListName(data[0]);
+            if (Array.isArray(data)) {
+                setTodoLists(data.map((listName, index) => ({
+                    id: index.toString(),
+                    listName: listName
+                })));
+                if (data.length > 0) {
+                    setTodoListName(data[0]);
+                } else {
+                    setTodoListName('');
+                }
             } else {
-                // エラー処理またはデフォルト値の設定
-                console.error('TodoListが見つかりませんでした');
+                console.error('Unexpected data format for todo lists');
+                setTodoLists([]);
                 setTodoListName('');
             }
         } catch (err) {
@@ -302,9 +309,9 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
                                 <X className="w-6 h-6 text-gray-600 cursor-pointer" onClick={closeCategoryModal} />
                             </div>
                             <ul className="space-y-2 mb-4">
-                                {categories.map((category) => (
-                                    <li key={category.id} className="bg-gray-100 rounded-lg p-2 text-gray-800 flex items-center justify-between">
-                                        {editingCategoryId === category.id ? (
+                                {todoLists.map((todoList) => (
+                                    <li key={todoList.id} className="bg-gray-100 rounded-lg p-2 text-gray-800 flex items-center justify-between">
+                                        {editingCategoryId === todoList.id ? (
                                             <>
                                                 <input
                                                     type="text"
@@ -312,18 +319,18 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
                                                     onChange={(e) => setEditingCategoryName(e.target.value)}
                                                     className="flex-grow mr-2 p-1 border rounded"
                                                 />
-                                                <button onClick={() => saveEditedCategory(category.id)} className="text-blue-500 mr-2">
+                                                <button onClick={() => saveEditedCategory(todoList.id)} className="text-blue-500 mr-2">
                                                     保存
                                                 </button>
                                             </>
                                         ) : (
                                             <>
-                                                <span>{category.name}</span>
+                                                <span>{todoList.listName}</span>
                                                 <div>
-                                                    <button onClick={() => startEditingCategory(category.id, category.name)} className="text-blue-500 mr-2">
+                                                    <button onClick={() => startEditingCategory(todoList.id, todoList.listName)} className="text-blue-500 mr-2">
                                                         <Edit className="w-4 h-4" />
                                                     </button>
-                                                    <button onClick={() => deleteCategory(category.id)} className="text-red-500">
+                                                    <button onClick={() => deleteCategory(todoList.id)} className="text-red-500">
                                                         <Trash2 className="w-4 h-4" />
                                                     </button>
                                                 </div>
