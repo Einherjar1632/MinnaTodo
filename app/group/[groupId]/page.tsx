@@ -56,19 +56,13 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
             const data = await response.json();
 
             if (Array.isArray(data)) {
-                setTodoLists(data.map((todoList, index) => ({
+                setTodoLists(data.map((todoList) => ({
                     id: todoList.id.toString(),
                     listName: todoList.listName
                 })));
-                if (data.length > 0) {
-                    setTodoListName(data[0].listName);
-                } else {
-                    setTodoListName('');
-                }
             } else {
                 console.error('Unexpected data format for todo lists');
                 setTodoLists([]);
-                setTodoListName('');
             }
         } catch (err) {
             console.error('Error fetching todo lists:', err);
@@ -190,8 +184,12 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
             {/* Navigation */}
             <div className="flex items-center px-4 py-2">
                 <Pencil className="w-8 h-8 mr-4 cursor-pointer" onClick={openModal} />
-                <div className="bg-white text-teal-500 px-6 py-2 rounded-full font-bold">
-                    {todoListName}
+                <div className="flex flex-wrap gap-2">
+                    {todoLists.map((todoList) => (
+                        <div key={todoList.id} className="bg-white text-teal-500 px-6 py-2 rounded-full font-bold">
+                            {todoList.listName}
+                        </div>
+                    ))}
                 </div>
                 <div className="flex-grow"></div>
                 <div className="flex space-x-4">
@@ -214,7 +212,7 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
                         <div className="flex-1">
                             <p className="text-black text-sm mb-1">
                                 {item === 1 ? "右上のメニューからカテゴリの追加・" : ""}
-                                {item === 2 ? "左上メニュー内の招待ボタンからパー" : ""}
+                                {item === 2 ? "左上メニュー内の招待ボタンから���ー" : ""}
                                 {item === 3 ? "便利な使い方はこちら↓" : ""}
                             </p>
                             <p className="text-black text-sm">
@@ -239,7 +237,7 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
                         <span className="text-white">ファミリーToDo</span>
                         <span className="text-white text-xs">今</span>
                     </div>
-                    <p className="text-white text-sm mb-2">パパがタスクを完了しました</p>
+                    <p className="text-white text-sm mb-2">パ���がタスクを完了しました</p>
                     <p className="text-white text-sm">牛肉</p>
                     <div className="flex justify-between mt-2">
                         <Image
@@ -275,8 +273,8 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
                 {/* TodoListsの表示 */}
                 <div className="mt-4">
                     <h3 className="text-lg font-bold mb-2">ToDoリスト</h3>
-                    {todoLists.map((list: { id: string, listName: string }) => (
-                        <div key={list.id} className="bg-gray-100 rounded-lg p-2 mb-2">
+                    {todoLists.map((list) => (
+                        <div key={list.id} className="bg-gray-100 rounded-lg p-2 mb-2 text-black">
                             {list.listName}
                         </div>
                     ))}
