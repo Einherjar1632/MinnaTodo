@@ -1,5 +1,5 @@
 import Header from '@/app/components/Header';
-import { Home, SmilePlus, AlignJustify, Trash2, MoreVertical, Plus } from "lucide-react"
+import { Pencil, SmilePlus, AlignJustify, Trash2, MoreVertical, Plus } from "lucide-react"
 import Image from "next/image"
 
 export default function GroupConfirmation({ params }: { params: { groupId: string } }) {
@@ -9,7 +9,7 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
 
             {/* Navigation */}
             <div className="flex items-center px-4 py-2">
-                <Home className="w-8 h-8 mr-4" />
+                <Pencil className="w-8 h-8 mr-4" />
                 <div className="bg-white text-teal-500 px-6 py-2 rounded-full font-bold">
                     やることリスト
                 </div>
