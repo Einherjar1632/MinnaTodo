@@ -3,7 +3,7 @@
 import Header from '@/app/components/Header';
 import { Pencil, SmilePlus, AlignJustify, Trash2, MoreVertical, Plus, X, User } from "lucide-react"
 import Image from "next/image"
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export default function GroupConfirmation({ params }: { params: { groupId: string } }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -38,15 +38,35 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
     }, [params.groupId]);
 
     const openModal = () => setIsModalOpen(true);
-    const closeModal = () => setIsModalOpen(false);
+    const closeModal = useCallback(() => {
+        setIsModalOpen(false);
+        setError(''); // エラーメッセージをリセット
+    }, []);
 
     const handleGroupNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setGroupName(e.target.value);
     };
 
-    const saveGroupName = () => {
-        // ここでグループ名の保存処理を実装
-        closeModal();
+    const saveGroupName = async () => {
+        setIsLoading(true);
+        try {
+            const response = await fetch('/api/groups/rename-group', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ groupId: params.groupId, groupName }),
+            });
+            if (!response.ok) {
+                throw new Error('Failed to save group name');
+            }
+            setIsLoading(false);
+            closeModal();
+        } catch (err) {
+            console.error('Error saving group name:', err);
+            setError('グループ名の保存に失敗しました');
+            setIsLoading(false);
+        }
     };
 
     if (isLoading) {
@@ -171,9 +191,11 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
                         <button
                             onClick={saveGroupName}
                             className="w-full bg-teal-500 text-white py-2 rounded mb-4"
+                            disabled={isLoading}
                         >
-                            保存
+                            {isLoading ? 'Saving...' : '保存'}
                         </button>
+                        {error && <p className="text-red-500 mb-4">{error}</p>}
                         <h3 className="font-bold text-gray-800 mb-3">メンバー</h3>
                         <ul className="space-y-2">
                             {members.map((member, index) => (
