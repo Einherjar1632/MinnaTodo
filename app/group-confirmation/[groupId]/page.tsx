@@ -1,7 +1,8 @@
 import GroupConfirmationClient from '../../components/GroupConfirmationClient';
 
 export default function GroupConfirmation({ params }: { params: { groupId: string } }) {
-    const groupUrl = `https://minnanotodo.jp/group/${params.groupId}`;
+    const domain = process.env.NEXT_PUBLIC_DOMAIN || 'http://localhost:3000';
+    const groupUrl = `${domain}/group/${params.groupId}`;
 
     return (
         <div className="min-h-screen bg-blue-50 flex flex-col">
