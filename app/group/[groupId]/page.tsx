@@ -1,14 +1,19 @@
 'use client';
 
 import Header from '@/app/components/Header';
-import { Pencil, SmilePlus, AlignJustify, Trash2, MoreVertical, Plus, X } from "lucide-react"
+import { Pencil, SmilePlus, AlignJustify, Trash2, MoreVertical, Plus, X, User } from "lucide-react"
 import Image from "next/image"
 import { useState } from 'react';
 
 export default function GroupConfirmation({ params }: { params: { groupId: string } }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [groupName, setGroupName] = useState("ファミリーToDo"); // 仮のグループ名
-    const [members] = useState(["パパ", "ママ", "子供1", "子供2"]); // 仮のメンバーリスト
+    const [members] = useState([
+        { name: "パパ", color: "bg-blue-500" },
+        { name: "ママ", color: "bg-pink-500" },
+        { name: "子供1", color: "bg-green-500" },
+        { name: "子供2", color: "bg-purple-500" }
+    ]);
 
     const openModal = () => setIsModalOpen(true);
     const closeModal = () => setIsModalOpen(false);
@@ -139,10 +144,15 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
                         >
                             保存
                         </button>
-                        <h3 className="font-bold text-gray-800 mb-2">メンバー</h3>
-                        <ul className="text-gray-600">
+                        <h3 className="font-bold text-gray-800 mb-3">メンバー</h3>
+                        <ul className="space-y-2">
                             {members.map((member, index) => (
-                                <li key={index} className="mb-1">{member}</li>
+                                <li key={index} className="flex items-center bg-gray-100 rounded-lg p-2">
+                                    <div className={`w-8 h-8 rounded-full ${member.color} flex items-center justify-center mr-3`}>
+                                        <User className="w-5 h-5 text-white" />
+                                    </div>
+                                    <span className="text-gray-800">{member.name}</span>
+                                </li>
                             ))}
                         </ul>
                     </div>
