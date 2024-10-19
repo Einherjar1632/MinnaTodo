@@ -1,7 +1,7 @@
 'use client';
 
 import Header from '@/app/components/Header';
-import { Pencil, SmilePlus, AlignJustify, Trash2, MoreVertical, Plus, X, User } from "lucide-react"
+import { Pencil, SmilePlus, FolderPlus, Trash2, MoreVertical, Plus, X, User } from "lucide-react"
 import Image from "next/image"
 import { useState, useEffect, useCallback } from 'react';
 
@@ -117,7 +117,7 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
                 <div className="flex-grow"></div>
                 <div className="flex space-x-4">
                     <SmilePlus className="w-8 h-8" />
-                    <AlignJustify className="w-8 h-8" />
+                    <FolderPlus className="w-8 h-8 cursor-pointer" onClick={() => {/* カテゴリ追加ダイアログを開く処理 */ }} />
                 </div>
             </div>
 
@@ -139,7 +139,7 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
                                 {item === 3 ? "便利な使い方はこちら↓" : ""}
                             </p>
                             <p className="text-black text-sm">
-                                {item === 1 ? "編集ができます。「買い物リスト」な" : ""}
+                                {item === 1 ? "編集ができます。「���い物リスト」な" : ""}
                                 {item === 2 ? "トナーを招待しましょう👍" : ""}
                                 {item === 3 ? "https://familytodo.notion.site/familytod..." : ""}
                             </p>
