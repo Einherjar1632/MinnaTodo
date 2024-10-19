@@ -1,15 +1,34 @@
+'use client';
+
 import Header from '@/app/components/Header';
-import { Pencil, SmilePlus, AlignJustify, Trash2, MoreVertical, Plus } from "lucide-react"
+import { Pencil, SmilePlus, AlignJustify, Trash2, MoreVertical, Plus, X } from "lucide-react"
 import Image from "next/image"
+import { useState } from 'react';
 
 export default function GroupConfirmation({ params }: { params: { groupId: string } }) {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [groupName, setGroupName] = useState("ファミリーToDo"); // 仮のグループ名
+    const [members] = useState(["パパ", "ママ", "子供1", "子供2"]); // 仮のメンバーリスト
+
+    const openModal = () => setIsModalOpen(true);
+    const closeModal = () => setIsModalOpen(false);
+
+    const handleGroupNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setGroupName(e.target.value);
+    };
+
+    const saveGroupName = () => {
+        // ここでグループ名の保存処理を実装
+        closeModal();
+    };
+
     return (
         <div className="flex flex-col h-screen bg-teal-500 text-white font-sans">
             <Header />
 
             {/* Navigation */}
             <div className="flex items-center px-4 py-2">
-                <Pencil className="w-8 h-8 mr-4" />
+                <Pencil className="w-8 h-8 mr-4 cursor-pointer" onClick={openModal} />
                 <div className="bg-white text-teal-500 px-6 py-2 rounded-full font-bold">
                     やることリスト
                 </div>
@@ -99,6 +118,36 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
                     <Plus className="w-8 h-8" />
                 </button>
             </div>
+
+            {/* Modal */}
+            {isModalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-lg p-6 w-full max-w-sm">
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-xl font-bold text-gray-800">グループ設定</h2>
+                            <X className="w-6 h-6 text-gray-600 cursor-pointer" onClick={closeModal} />
+                        </div>
+                        <input
+                            type="text"
+                            value={groupName}
+                            onChange={handleGroupNameChange}
+                            className="w-full p-2 border border-gray-300 rounded mb-4 text-gray-800"
+                        />
+                        <button
+                            onClick={saveGroupName}
+                            className="w-full bg-teal-500 text-white py-2 rounded mb-4"
+                        >
+                            保存
+                        </button>
+                        <h3 className="font-bold text-gray-800 mb-2">メンバー</h3>
+                        <ul className="text-gray-600">
+                            {members.map((member, index) => (
+                                <li key={index} className="mb-1">{member}</li>
+                            ))}
+                        </ul>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
