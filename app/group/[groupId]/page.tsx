@@ -7,6 +7,7 @@ import { useState, useEffect, useCallback } from 'react';
 
 export default function GroupConfirmation({ params }: { params: { groupId: string } }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [todoListName, setTodoListName] = useState("");
     const [groupName, setGroupName] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
@@ -87,7 +88,7 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
             <div className="flex items-center px-4 py-2">
                 <Pencil className="w-8 h-8 mr-4 cursor-pointer" onClick={openModal} />
                 <div className="bg-white text-teal-500 px-6 py-2 rounded-full font-bold">
-                    {groupName}
+                    {todoListName}
                 </div>
                 <div className="flex-grow"></div>
                 <div className="flex space-x-4">
