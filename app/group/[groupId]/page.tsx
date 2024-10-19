@@ -4,10 +4,13 @@ import Header from '@/app/components/Header';
 import { Pencil, SmilePlus, FolderPlus, Trash2, MoreVertical, Plus, X, User, Edit } from "lucide-react"
 import Image from "next/image"
 import { useState, useEffect, useCallback } from 'react';
+import { CreateTodoListRequest, CreateTodoListResponse } from '@/app/api/todo-lists/route';
+import { GroupResponse } from '@/app/api/groups/[uuid]/route';
 
 export default function GroupConfirmation({ params }: { params: { groupId: string } }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [todoListName, setTodoListName] = useState("");
+    const [groupId, setGroupId] = useState<number | null>(null);
     const [groupName, setGroupName] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
@@ -31,13 +34,14 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
         try {
             const response = await fetch(`/api/groups/${params.groupId}`);
             if (!response.ok) {
-                throw new Error('Failed to fetch group name');
+                throw new Error('グループ名の取得に失敗しました');
             }
-            const data = await response.json();
+            const data: GroupResponse = await response.json();
+            setGroupId(data.id);
             setGroupName(data.groupName);
             setIsLoading(false);
         } catch (err) {
-            console.error('Error fetching group name:', err);
+            console.error('グループ名の取得中にエラーが発生しました:', err);
             setError('グループ名の取得に失敗しました');
             setIsLoading(false);
         }
@@ -52,12 +56,12 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
             const data = await response.json();
 
             if (Array.isArray(data)) {
-                setTodoLists(data.map((listName, index) => ({
-                    id: index.toString(),
-                    listName: listName
+                setTodoLists(data.map((todoList, index) => ({
+                    id: todoList.id.toString(),
+                    listName: todoList.listName
                 })));
                 if (data.length > 0) {
-                    setTodoListName(data[0]);
+                    setTodoListName(data[0].listName);
                 } else {
                     setTodoListName('');
                 }
@@ -120,14 +124,35 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
         setNewCategoryName("");
     };
 
-    const addNewCategory = () => {
-        if (newCategoryName.trim()) {
-            const newCategory = {
-                id: Date.now().toString(), // 一時的なIDとして現在のタイムスタンプを使用
-                name: newCategoryName.trim()
-            };
-            setCategories([...categories, newCategory]);
-            closeNewCategoryModal();
+    const addNewCategory = async () => {
+        if (newCategoryName.trim() && groupId !== null) {
+            try {
+                const request: CreateTodoListRequest = {
+                    groupId: groupId,
+                    listName: newCategoryName.trim()
+                };
+
+                const response = await fetch('/api/todo-lists', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(request),
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to add new TodoList');
+                }
+
+                const data: CreateTodoListResponse = await response.json();
+
+                // 新しいTodoListが追加されたら、リストを再取得
+                await fetchTodoLists();
+                closeNewCategoryModal();
+            } catch (error) {
+                console.error('新しいTodoListの追加に失敗しました:', error);
+                setError('新しいTodoListの追加に失敗しました');
+            }
         }
     };
 
@@ -250,7 +275,7 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
                 {/* TodoListsの表示 */}
                 <div className="mt-4">
                     <h3 className="text-lg font-bold mb-2">ToDoリスト</h3>
-                    {todoLists.map((list: { id: number, listName: string }) => (
+                    {todoLists.map((list: { id: string, listName: string }) => (
                         <div key={list.id} className="bg-gray-100 rounded-lg p-2 mb-2">
                             {list.listName}
                         </div>
@@ -311,31 +336,15 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
                             <ul className="space-y-2 mb-4">
                                 {todoLists.map((todoList) => (
                                     <li key={todoList.id} className="bg-gray-100 rounded-lg p-2 text-gray-800 flex items-center justify-between">
-                                        {editingCategoryId === todoList.id ? (
-                                            <>
-                                                <input
-                                                    type="text"
-                                                    value={editingCategoryName}
-                                                    onChange={(e) => setEditingCategoryName(e.target.value)}
-                                                    className="flex-grow mr-2 p-1 border rounded"
-                                                />
-                                                <button onClick={() => saveEditedCategory(todoList.id)} className="text-blue-500 mr-2">
-                                                    保存
-                                                </button>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <span>{todoList.listName}</span>
-                                                <div>
-                                                    <button onClick={() => startEditingCategory(todoList.id, todoList.listName)} className="text-blue-500 mr-2">
-                                                        <Edit className="w-4 h-4" />
-                                                    </button>
-                                                    <button onClick={() => deleteCategory(todoList.id)} className="text-red-500">
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </button>
-                                                </div>
-                                            </>
-                                        )}
+                                        <span>{todoList.listName}</span>
+                                        <div>
+                                            <button onClick={() => startEditingCategory(todoList.id, todoList.listName)} className="text-blue-500 mr-2">
+                                                <Edit className="w-4 h-4" />
+                                            </button>
+                                            <button onClick={() => deleteCategory(todoList.id)} className="text-red-500">
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
                                     </li>
                                 ))}
                             </ul>

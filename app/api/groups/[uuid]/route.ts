@@ -3,6 +3,15 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+// レスポンスの型定義
+export interface GroupResponse {
+  id: number;
+  groupName: string;
+  uuid: string;
+  createdAt: string;
+  lastUsedAt: string;
+}
+
 export async function GET(
   request: Request,
   { params }: { params: { uuid: string } }
@@ -12,16 +21,30 @@ export async function GET(
   try {
     const group = await prisma.group.findUnique({
       where: { uuid: uuid },
-      select: { groupName: true }
+      select: {
+        id: true,
+        groupName: true,
+        uuid: true,
+        createdAt: true,
+        lastUsedAt: true,
+      }
     });
 
     if (!group) {
-      return NextResponse.json({ error: 'Group not found' }, { status: 404 });
+      return NextResponse.json({ error: 'グループが見つかりません' }, { status: 404 });
     }
 
-    return NextResponse.json({ groupName: group.groupName });
+    const response: GroupResponse = {
+      id: group.id,
+      groupName: group.groupName,
+      uuid: group.uuid,
+      createdAt: group.createdAt.toISOString(),
+      lastUsedAt: group.lastUsedAt.toISOString(),
+    };
+
+    return NextResponse.json(response);
   } catch (error) {
-    console.error('Error fetching group:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    console.error('グループの取得中にエラーが発生しました:', error);
+    return NextResponse.json({ error: '内部サーバーエラー' }, { status: 500 });
   }
 }

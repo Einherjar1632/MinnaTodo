@@ -18,6 +18,7 @@ export async function GET(request: Request) {
       },
       orderBy: { sortOrder: 'asc' },
       select: {
+        id: true,
         listName: true
       }
     });
@@ -26,10 +27,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'グループが見つかりません、またはTodoListが存在しません' }, { status: 404 });
     }
 
-    // TodoListの名前のみを配列として返す
-    const todoListNames = todoLists.map(list => list.listName);
-
-    return NextResponse.json(todoListNames);
+    return NextResponse.json(todoLists);
   } catch (error) {
     console.error('TodoListの取得中にエラーが発生しました:', error);
     return NextResponse.json({ error: 'TodoListの取得に失敗しました' }, { status: 500 });
