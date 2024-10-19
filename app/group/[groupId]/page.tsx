@@ -19,6 +19,11 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
     ]);
     const [todoLists, setTodoLists] = useState([]);
 
+    const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+    const [isNewCategoryModalOpen, setIsNewCategoryModalOpen] = useState(false);
+    const [categories, setCategories] = useState<string[]>([]);
+    const [newCategoryName, setNewCategoryName] = useState("");
+
     const fetchGroupName = useCallback(async () => {
         try {
             const response = await fetch(`/api/groups/${params.groupId}`);
@@ -96,6 +101,22 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
         }
     };
 
+    const openCategoryModal = () => setIsCategoryModalOpen(true);
+    const closeCategoryModal = () => setIsCategoryModalOpen(false);
+
+    const openNewCategoryModal = () => setIsNewCategoryModalOpen(true);
+    const closeNewCategoryModal = () => {
+        setIsNewCategoryModalOpen(false);
+        setNewCategoryName("");
+    };
+
+    const addNewCategory = () => {
+        if (newCategoryName.trim()) {
+            setCategories([...categories, newCategoryName.trim()]);
+            closeNewCategoryModal();
+        }
+    };
+
     if (isLoading) {
         return <div>Loading...</div>;
     }
@@ -117,7 +138,7 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
                 <div className="flex-grow"></div>
                 <div className="flex space-x-4">
                     <SmilePlus className="w-8 h-8" />
-                    <FolderPlus className="w-8 h-8 cursor-pointer" onClick={() => {/* カテゴリ追加ダイアログを開く処理 */ }} />
+                    <FolderPlus className="w-8 h-8 cursor-pointer" onClick={openCategoryModal} />
                 </div>
             </div>
 
@@ -139,7 +160,7 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
                                 {item === 3 ? "便利な使い方はこちら↓" : ""}
                             </p>
                             <p className="text-black text-sm">
-                                {item === 1 ? "編集ができます。「���い物リスト」な" : ""}
+                                {item === 1 ? "編集ができます。「い物リスト」な" : ""}
                                 {item === 2 ? "トナーを招待しましょう👍" : ""}
                                 {item === 3 ? "https://familytodo.notion.site/familytod..." : ""}
                             </p>
@@ -242,6 +263,56 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
                                     </li>
                                 ))}
                             </ul>
+                        </div>
+                    </div>
+                )}
+
+                {/* カテゴリモーダル */}
+                {isCategoryModalOpen && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+                        <div className="bg-white rounded-lg p-6 w-full max-w-sm">
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-xl font-bold text-gray-800">カテゴリ一覧</h2>
+                                <X className="w-6 h-6 text-gray-600 cursor-pointer" onClick={closeCategoryModal} />
+                            </div>
+                            <ul className="space-y-2 mb-4">
+                                {categories.map((category, index) => (
+                                    <li key={index} className="bg-gray-100 rounded-lg p-2 text-gray-800">
+                                        {category}
+                                    </li>
+                                ))}
+                            </ul>
+                            <button
+                                onClick={openNewCategoryModal}
+                                className="w-full bg-teal-500 text-white py-2 rounded"
+                            >
+                                新しいカテゴリを追加
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* 新しいカテゴリ追加モーダル */}
+                {isNewCategoryModalOpen && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+                        <div className="bg-white rounded-lg p-6 w-full max-w-sm">
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-xl font-bold text-gray-800">新しいカテゴリ</h2>
+                                <X className="w-6 h-6 text-gray-600 cursor-pointer" onClick={closeNewCategoryModal} />
+                            </div>
+                            <input
+                                type="text"
+                                value={newCategoryName}
+                                onChange={(e) => setNewCategoryName(e.target.value)}
+                                placeholder="カテゴリ名を入力"
+                                className="w-full p-2 border border-gray-300 rounded mb-4 text-gray-800"
+                            />
+                            <button
+                                onClick={addNewCategory}
+                                className="w-full bg-teal-500 text-white py-2 rounded"
+                            >
+                                追加
+                            </button>
                         </div>
                     </div>
                 )}
