@@ -20,7 +20,7 @@ export default function GroupConfirmationClient({ groupUrl }: GroupConfirmationC
     };
 
     const handleNavigate = () => {
-        router.push('/todo-list'); // 追加
+        router.push(groupUrl); // グループURLに直接遷移するように修正
     };
 
     return (
