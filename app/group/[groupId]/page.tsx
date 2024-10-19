@@ -17,30 +17,30 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
         { name: "子供2", color: "bg-purple-500" }
     ]);
 
-    useEffect(() => {
-        const fetchGroupName = async () => {
-            try {
-                const response = await fetch(`/api/groups/${params.groupId}`);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch group name');
-                }
-                const data = await response.json();
-                setGroupName(data.groupName);
-                setIsLoading(false);
-            } catch (err) {
-                console.error('Error fetching group name:', err);
-                setError('グループ名の取得に失敗しました');
-                setIsLoading(false);
+    const fetchGroupName = useCallback(async () => {
+        try {
+            const response = await fetch(`/api/groups/${params.groupId}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch group name');
             }
-        };
-
-        fetchGroupName();
+            const data = await response.json();
+            setGroupName(data.groupName);
+            setIsLoading(false);
+        } catch (err) {
+            console.error('Error fetching group name:', err);
+            setError('グループ名の取得に失敗しました');
+            setIsLoading(false);
+        }
     }, [params.groupId]);
+
+    useEffect(() => {
+        fetchGroupName();
+    }, [fetchGroupName]);
 
     const openModal = () => setIsModalOpen(true);
     const closeModal = useCallback(() => {
         setIsModalOpen(false);
-        setError(''); // エラーメッセージをリセット
+        setError('');
     }, []);
 
     const handleGroupNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,7 +48,8 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
     };
 
     const saveGroupName = async () => {
-        setIsLoading(true);
+        closeModal(); // モーダルを即座に閉じる
+
         try {
             const response = await fetch('/api/groups/rename-group', {
                 method: 'POST',
@@ -60,12 +61,13 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
             if (!response.ok) {
                 throw new Error('Failed to save group name');
             }
-            setIsLoading(false);
-            closeModal();
+            // 成功した場合、グループ名を再取得して最新の状態を反映
+            await fetchGroupName();
         } catch (err) {
             console.error('Error saving group name:', err);
             setError('グループ名の保存に失敗しました');
-            setIsLoading(false);
+            // エラーが発生した場合、モーダルを再度開いてエラーを表示
+            openModal();
         }
     };
 
@@ -191,9 +193,8 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
                         <button
                             onClick={saveGroupName}
                             className="w-full bg-teal-500 text-white py-2 rounded mb-4"
-                            disabled={isLoading}
                         >
-                            {isLoading ? 'Saving...' : '保存'}
+                            保存
                         </button>
                         {error && <p className="text-red-500 mb-4">{error}</p>}
                         <h3 className="font-bold text-gray-800 mb-3">メンバー</h3>
