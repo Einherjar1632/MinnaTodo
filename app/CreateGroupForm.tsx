@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { CreateGroupRequest, CreateGroupResponse } from "@/app/api/groups/route";
 import { CreateUserRequest, CreateUserResponse } from "@/app/api/users/route";
+import { CreateTodoListRequest, CreateTodoListResponse } from "@/app/api/todo-lists/route";
 
 export default function CreateGroupForm() {
     const [groupName, setGroupName] = useState("");
@@ -49,7 +50,26 @@ export default function CreateGroupForm() {
 
                 if (userResponse.ok) {
                     const userData: CreateUserResponse = await userResponse.json();
-                    router.push(`/group-confirmation/${groupData.uuid}`);
+
+                    // TodoListの作成
+                    const todoListRequestData: CreateTodoListRequest = {
+                        groupId: groupData.id,
+                        listName: "やる事リスト"
+                    };
+                    const todoListResponse = await fetch('/api/todo-lists', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(todoListRequestData),
+                    });
+
+                    if (todoListResponse.ok) {
+                        const todoListData: CreateTodoListResponse = await todoListResponse.json();
+                        router.push(`/group-confirmation/${groupData.uuid}`);
+                    } else {
+                        console.error('TodoListの作成に失敗しました');
+                    }
                 } else {
                     console.error('ユーザーの作成に失敗しました');
                 }
