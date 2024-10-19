@@ -17,6 +17,7 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
         { name: "子供1", color: "bg-green-500" },
         { name: "子供2", color: "bg-purple-500" }
     ]);
+    const [todoLists, setTodoLists] = useState([]);
 
     const fetchGroupName = useCallback(async () => {
         try {
@@ -34,9 +35,32 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
         }
     }, [params.groupId]);
 
+    const fetchTodoLists = useCallback(async () => {
+        try {
+            const response = await fetch(`/api/todo-lists/get-todoLists?groupUuid=${params.groupId}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch todo lists');
+            }
+            const data = await response.json();
+
+            if (Array.isArray(data) && data.length > 0) {
+                // 最初のTodoList名を設定する（または必要に応じて処理を変更）
+                setTodoListName(data[0]);
+            } else {
+                // エラー処理またはデフォルト値の設定
+                console.error('TodoListが見つかりませんでした');
+                setTodoListName('');
+            }
+        } catch (err) {
+            console.error('Error fetching todo lists:', err);
+            setError('ToDoリストの取得に失敗しました');
+        }
+    }, [params.groupId]);
+
     useEffect(() => {
         fetchGroupName();
-    }, [fetchGroupName]);
+        fetchTodoLists();
+    }, [fetchGroupName, fetchTodoLists]);
 
     const openModal = () => setIsModalOpen(true);
     const closeModal = useCallback(() => {
@@ -168,50 +192,60 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                 </div>
-            </div>
 
-            {/* Add Button */}
-            <div className="absolute bottom-4 right-4">
-                <button className="bg-teal-500 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg">
-                    <Plus className="w-8 h-8" />
-                </button>
-            </div>
-
-            {/* Modal */}
-            {isModalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-lg p-6 w-full max-w-sm">
-                        <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-xl font-bold text-gray-800">グループ設定</h2>
-                            <X className="w-6 h-6 text-gray-600 cursor-pointer" onClick={closeModal} />
+                {/* TodoListsの表示 */}
+                <div className="mt-4">
+                    <h3 className="text-lg font-bold mb-2">ToDoリスト</h3>
+                    {todoLists.map((list: { id: number, listName: string }) => (
+                        <div key={list.id} className="bg-gray-100 rounded-lg p-2 mb-2">
+                            {list.listName}
                         </div>
-                        <input
-                            type="text"
-                            value={groupName}
-                            onChange={handleGroupNameChange}
-                            className="w-full p-2 border border-gray-300 rounded mb-4 text-gray-800"
-                        />
-                        <button
-                            onClick={saveGroupName}
-                            className="w-full bg-teal-500 text-white py-2 rounded mb-4"
-                        >
-                            保存
-                        </button>
-                        {error && <p className="text-red-500 mb-4">{error}</p>}
-                        <h3 className="font-bold text-gray-800 mb-3">メンバー</h3>
-                        <ul className="space-y-2">
-                            {members.map((member, index) => (
-                                <li key={index} className="flex items-center bg-gray-100 rounded-lg p-2">
-                                    <div className={`w-8 h-8 rounded-full ${member.color} flex items-center justify-center mr-3`}>
-                                        <User className="w-5 h-5 text-white" />
-                                    </div>
-                                    <span className="text-gray-800">{member.name}</span>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+                    ))}
                 </div>
-            )}
+
+                {/* Add Button */}
+                <div className="absolute bottom-4 right-4">
+                    <button className="bg-teal-500 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg">
+                        <Plus className="w-8 h-8" />
+                    </button>
+                </div>
+
+                {/* Modal */}
+                {isModalOpen && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+                        <div className="bg-white rounded-lg p-6 w-full max-w-sm">
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-xl font-bold text-gray-800">グループ設定</h2>
+                                <X className="w-6 h-6 text-gray-600 cursor-pointer" onClick={closeModal} />
+                            </div>
+                            <input
+                                type="text"
+                                value={groupName}
+                                onChange={handleGroupNameChange}
+                                className="w-full p-2 border border-gray-300 rounded mb-4 text-gray-800"
+                            />
+                            <button
+                                onClick={saveGroupName}
+                                className="w-full bg-teal-500 text-white py-2 rounded mb-4"
+                            >
+                                保存
+                            </button>
+                            {error && <p className="text-red-500 mb-4">{error}</p>}
+                            <h3 className="font-bold text-gray-800 mb-3">メンバー</h3>
+                            <ul className="space-y-2">
+                                {members.map((member, index) => (
+                                    <li key={index} className="flex items-center bg-gray-100 rounded-lg p-2">
+                                        <div className={`w-8 h-8 rounded-full ${member.color} flex items-center justify-center mr-3`}>
+                                            <User className="w-5 h-5 text-white" />
+                                        </div>
+                                        <span className="text-gray-800">{member.name}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
