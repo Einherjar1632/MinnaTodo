@@ -3,17 +3,39 @@
 import Header from '@/app/components/Header';
 import { Pencil, SmilePlus, AlignJustify, Trash2, MoreVertical, Plus, X, User } from "lucide-react"
 import Image from "next/image"
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function GroupConfirmation({ params }: { params: { groupId: string } }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [groupName, setGroupName] = useState("ファミリーToDo"); // 仮のグループ名
+    const [groupName, setGroupName] = useState("");
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState("");
     const [members] = useState([
         { name: "パパ", color: "bg-blue-500" },
         { name: "ママ", color: "bg-pink-500" },
         { name: "子供1", color: "bg-green-500" },
         { name: "子供2", color: "bg-purple-500" }
     ]);
+
+    useEffect(() => {
+        const fetchGroupName = async () => {
+            try {
+                const response = await fetch(`/api/groups/${params.groupId}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch group name');
+                }
+                const data = await response.json();
+                setGroupName(data.groupName);
+                setIsLoading(false);
+            } catch (err) {
+                console.error('Error fetching group name:', err);
+                setError('グループ名の取得に失敗しました');
+                setIsLoading(false);
+            }
+        };
+
+        fetchGroupName();
+    }, [params.groupId]);
 
     const openModal = () => setIsModalOpen(true);
     const closeModal = () => setIsModalOpen(false);
@@ -27,6 +49,14 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
         closeModal();
     };
 
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
+
+    if (error) {
+        return <div>{error}</div>;
+    }
+
     return (
         <div className="flex flex-col h-screen bg-teal-500 text-white font-sans">
             <Header />
@@ -35,7 +65,7 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
             <div className="flex items-center px-4 py-2">
                 <Pencil className="w-8 h-8 mr-4 cursor-pointer" onClick={openModal} />
                 <div className="bg-white text-teal-500 px-6 py-2 rounded-full font-bold">
-                    やることリスト
+                    {groupName}
                 </div>
                 <div className="flex-grow"></div>
                 <div className="flex space-x-4">
