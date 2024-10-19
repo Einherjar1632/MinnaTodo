@@ -1,7 +1,7 @@
 'use client';
 
 import Header from '@/app/components/Header';
-import { Pencil, SmilePlus, FolderPlus, Trash2, MoreVertical, Plus, X, User } from "lucide-react"
+import { Pencil, SmilePlus, FolderPlus, Trash2, MoreVertical, Plus, X, User, Edit } from "lucide-react"
 import Image from "next/image"
 import { useState, useEffect, useCallback } from 'react';
 
@@ -21,8 +21,11 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
 
     const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
     const [isNewCategoryModalOpen, setIsNewCategoryModalOpen] = useState(false);
-    const [categories, setCategories] = useState<string[]>([]);
+    const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
     const [newCategoryName, setNewCategoryName] = useState("");
+
+    const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
+    const [editingCategoryName, setEditingCategoryName] = useState("");
 
     const fetchGroupName = useCallback(async () => {
         try {
@@ -112,9 +115,32 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
 
     const addNewCategory = () => {
         if (newCategoryName.trim()) {
-            setCategories([...categories, newCategoryName.trim()]);
+            const newCategory = {
+                id: Date.now().toString(), // 一時的なIDとして現在のタイムスタンプを使用
+                name: newCategoryName.trim()
+            };
+            setCategories([...categories, newCategory]);
             closeNewCategoryModal();
         }
+    };
+
+    const startEditingCategory = (id: string, name: string) => {
+        setEditingCategoryId(id);
+        setEditingCategoryName(name);
+    };
+
+    const saveEditedCategory = (id: string) => {
+        if (editingCategoryName.trim()) {
+            setCategories(categories.map(cat =>
+                cat.id === id ? { ...cat, name: editingCategoryName.trim() } : cat
+            ));
+            setEditingCategoryId(null);
+            setEditingCategoryName("");
+        }
+    };
+
+    const deleteCategory = (id: string) => {
+        setCategories(categories.filter(cat => cat.id !== id));
     };
 
     if (isLoading) {
@@ -267,18 +293,42 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
                     </div>
                 )}
 
-                {/* カテゴリモーダル */}
+                {/* Todoリストモーダル */}
                 {isCategoryModalOpen && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
                         <div className="bg-white rounded-lg p-6 w-full max-w-sm">
                             <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-xl font-bold text-gray-800">カテゴリ一覧</h2>
+                                <h2 className="text-xl font-bold text-gray-800">Todoリスト設定</h2>
                                 <X className="w-6 h-6 text-gray-600 cursor-pointer" onClick={closeCategoryModal} />
                             </div>
                             <ul className="space-y-2 mb-4">
-                                {categories.map((category, index) => (
-                                    <li key={index} className="bg-gray-100 rounded-lg p-2 text-gray-800">
-                                        {category}
+                                {categories.map((category) => (
+                                    <li key={category.id} className="bg-gray-100 rounded-lg p-2 text-gray-800 flex items-center justify-between">
+                                        {editingCategoryId === category.id ? (
+                                            <>
+                                                <input
+                                                    type="text"
+                                                    value={editingCategoryName}
+                                                    onChange={(e) => setEditingCategoryName(e.target.value)}
+                                                    className="flex-grow mr-2 p-1 border rounded"
+                                                />
+                                                <button onClick={() => saveEditedCategory(category.id)} className="text-blue-500 mr-2">
+                                                    保存
+                                                </button>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <span>{category.name}</span>
+                                                <div>
+                                                    <button onClick={() => startEditingCategory(category.id, category.name)} className="text-blue-500 mr-2">
+                                                        <Edit className="w-4 h-4" />
+                                                    </button>
+                                                    <button onClick={() => deleteCategory(category.id)} className="text-red-500">
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            </>
+                                        )}
                                     </li>
                                 ))}
                             </ul>
@@ -286,25 +336,25 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
                                 onClick={openNewCategoryModal}
                                 className="w-full bg-teal-500 text-white py-2 rounded"
                             >
-                                新しいカテゴリを追加
+                                新しいTodoリストを追加
                             </button>
                         </div>
                     </div>
                 )}
 
-                {/* 新しいカテゴリ追加モーダル */}
+                {/* 新しいTodoリスト追加モーダル */}
                 {isNewCategoryModalOpen && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
                         <div className="bg-white rounded-lg p-6 w-full max-w-sm">
                             <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-xl font-bold text-gray-800">新しいカテゴリ</h2>
+                                <h2 className="text-xl font-bold text-gray-800">新しいTodoリスト</h2>
                                 <X className="w-6 h-6 text-gray-600 cursor-pointer" onClick={closeNewCategoryModal} />
                             </div>
                             <input
                                 type="text"
                                 value={newCategoryName}
                                 onChange={(e) => setNewCategoryName(e.target.value)}
-                                placeholder="カテゴリ名を入力"
+                                placeholder="Todoリスト名を入力"
                                 className="w-full p-2 border border-gray-300 rounded mb-4 text-gray-800"
                             />
                             <button
