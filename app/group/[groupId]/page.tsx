@@ -153,18 +153,25 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
         }
     };
 
-    const startEditingCategory = (id: string, name: string) => {
-        setEditingCategoryId(id);
-        setEditingCategoryName(name);
-    };
+    const editCategory = async (id: string, newName: string) => {
+        try {
+            const response = await fetch('/api/todo-lists/rename-todoList', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ todoListId: id, newName }),
+            });
 
-    const saveEditedCategory = (id: string) => {
-        if (editingCategoryName.trim()) {
-            setCategories(categories.map(cat =>
-                cat.id === id ? { ...cat, name: editingCategoryName.trim() } : cat
-            ));
-            setEditingCategoryId(null);
-            setEditingCategoryName("");
+            if (!response.ok) {
+                throw new Error('Failed to rename TodoList');
+            }
+
+            // 編集が成功したら、TodoListsを再取得
+            await fetchTodoLists();
+        } catch (error) {
+            console.error('Error renaming TodoList:', error);
+            setError('TodoListの名前変更に失敗しました');
         }
     };
 
@@ -325,7 +332,7 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
                 isOpen={isCategoryModalOpen}
                 onClose={closeCategoryModal}
                 todoLists={todoLists}
-                onEditCategory={startEditingCategory}
+                onEditCategory={editCategory}
                 onDeleteCategory={deleteCategory}
                 onAddNewCategory={openNewCategoryModal}
             />
