@@ -168,8 +168,26 @@ export default function GroupConfirmation({ params }: { params: { groupId: strin
         }
     };
 
-    const deleteCategory = (id: string) => {
-        setCategories(categories.filter(cat => cat.id !== id));
+    const deleteCategory = async (id: string) => {
+        try {
+            const response = await fetch('/api/todo-lists/delete-todoList', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ todoListId: id }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to delete TodoList');
+            }
+
+            // 削除が成功したら、TodoListsを再取得
+            await fetchTodoLists();
+        } catch (error) {
+            console.error('Error deleting TodoList:', error);
+            setError('TodoListの削除に失敗しました');
+        }
     };
 
     if (isLoading) {

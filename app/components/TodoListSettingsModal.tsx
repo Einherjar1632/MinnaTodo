@@ -6,7 +6,7 @@ interface TodoListSettingsModalProps {
     onClose: () => void;
     todoLists: { id: string; listName: string }[];
     onEditCategory: (id: string, name: string) => void;
-    onDeleteCategory: (id: string) => void;
+    onDeleteCategory: (id: string) => Promise<void>;
     onAddNewCategory: () => void;
 }
 
