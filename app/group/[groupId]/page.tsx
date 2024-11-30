@@ -3,14 +3,15 @@
 import Header from '@/app/components/Header';
 import { Pencil, SmilePlus, FolderPlus, Trash2, MoreVertical, Plus, X, User, Edit } from "lucide-react"
 import Image from "next/image"
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, use } from 'react';
 import { CreateTodoListRequest, CreateTodoListResponse } from '@/app/api/todo-lists/route';
 import { GroupResponse } from '@/app/api/groups/[uuid]/route';
 import GroupSettingsModal from '@/app/components/GroupSettingsModal';
 import TodoListSettingsModal from '@/app/components/TodoListSettingsModal';
 import NewTodoListModal from '@/app/components/NewTodoListModal';
 
-export default function GroupConfirmation({ params }: { params: { groupId: string } }) {
+export default function GroupConfirmation(props: { params: Promise<{ groupId: string }> }) {
+    const params = use(props.params);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [todoListName, setTodoListName] = useState("");
     const [groupId, setGroupId] = useState<number | null>(null);

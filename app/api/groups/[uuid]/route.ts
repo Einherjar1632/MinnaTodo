@@ -12,10 +12,8 @@ export interface GroupResponse {
   lastUsedAt: string;
 }
 
-export async function GET(
-  request: Request,
-  { params }: { params: { uuid: string } }
-) {
+export async function GET(request: Request, props: { params: Promise<{ uuid: string }> }) {
+  const params = await props.params;
   const uuid = params.uuid;
 
   try {
